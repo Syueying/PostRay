@@ -1,6 +1,6 @@
-# Privacy Policy for Claw
+# Privacy Policy for PostRay
 
-**Last Updated:** April 20, 2026
+**Last Updated:** May 26, 2026
 
 **Developer:** Syueying
 
@@ -8,13 +8,13 @@
 
 ## Introduction
 
-This Privacy Policy describes how Claw ("we", "our", or "the Chrome Extension") collects, uses, and protects your information. We are committed to protecting your privacy and being transparent about our data practices.
+This Privacy Policy describes how PostRay ("we", "our", or "the Chrome Extension") collects, uses, and protects your information. We are committed to protecting your privacy and being transparent about our data practices.
 
 ## Information We Collect
 
 **We DO NOT collect any personal information or data.**
 
-Claw is designed with privacy in mind. All data, if any, is stored locally on your device and is never transmitted to external servers.
+PostRay is designed with privacy in mind. All data is stored locally on your device and is never transmitted to external servers.
 
 ## How We Use Your Information
 
@@ -22,7 +22,7 @@ Since we don't collect any data, there is no usage of your information. All Chro
 
 ## Third-Party Services
 
-Claw does not use any third-party services or analytics tools.
+PostRay does not use any third-party services or analytics tools.
 
 ## Data Storage and Security
 
@@ -54,7 +54,7 @@ We comply with the California Consumer Privacy Act (CCPA):
 
 ## Changes to This Policy
 
-We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date. Continued use of Claw after changes constitutes acceptance of the updated policy.
+We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date. Continued use of PostRay after changes constitutes acceptance of the updated policy.
 
 ## Contact Us
 
@@ -62,10 +62,12 @@ If you have questions, concerns, or requests regarding this Privacy Policy:
 
 **Email:** ethel.yueying.sun@gmail.com
 
+**GitHub:** https://github.com/Syueying/PostRay
+
 We aim to respond to all inquiries within 48 hours.
 
 ---
 
-**Effective Date:** April 20, 2026
+**Effective Date:** May 26, 2026
 
-By using Claw, you acknowledge that you have read and understood this Privacy Policy.
+By using PostRay, you acknowledge that you have read and understood this Privacy Policy.

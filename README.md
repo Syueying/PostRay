@@ -49,7 +49,7 @@ If this tool saved you time, feel free to buy me a coffee ☕
 <!-- QR code placeholder — replace with your actual payment QR image -->
 <!-- 二维码占位符 — 替换为你实际的收款码图片 -->
 
-![donation qr code](./docs/qrcode.png)
+![donation qr code](./docs/qrcode.jpg)
 
 ---
 
