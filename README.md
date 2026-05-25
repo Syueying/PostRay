@@ -49,7 +49,9 @@ If this tool saved you time, feel free to buy me a coffee ☕
 <!-- QR code placeholder — replace with your actual payment QR image -->
 <!-- 二维码占位符 — 替换为你实际的收款码图片 -->
 
-![donation qr code](./docs/qrcode.jpg)
+<div align="center">
+  <img src="./docs/qrcode.jpg" width="200" alt="donation qr code" />
+</div>
 
 ---
 
