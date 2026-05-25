@@ -43,9 +43,9 @@
 ## Preview / 效果预览
 
 <div align="center">
-  <img src="./docs/postray_1.png" width="720" alt="PostRay collecting posts" />
+  <img src="./src/assets/1.png" width="720" alt="PostRay collecting posts" />
   <br /><br />
-  <img src="./docs/postray_2.png" width="720" alt="PostRay data viewer and export" />
+  <img src="./src/assets/2.png" width="720" alt="PostRay data viewer and export" />
 </div>
 
 ---
