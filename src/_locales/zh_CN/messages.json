@@ -190,6 +190,12 @@
     "message": "免费版默认采集最近 50 条公开帖文，升级后可使用自定义日期范围。",
     "description": "Hint for free users about date range"
   },
+  "freeUserDateHintPre": {
+    "message": "免费版仅采集最近 50 条帖文，"
+  },
+  "freeUserDateHintPost": {
+    "message": "后可使用自定义日期范围。"
+  },
   "navigateToInstagramAlert": {
     "message": "请先打开 Instagram 账号页面，再使用 PostRay。",
     "description": "Navigate to Instagram alert"
@@ -261,5 +267,53 @@
   },
   "workspaceHeadlineLabel": {
     "message": "Instagram 公开帖子数据"
+  },
+  "upgradeButtonLabel": {
+    "message": "升级"
+  },
+  "upgradeModalTitle": {
+    "message": "升级至 Pro"
+  },
+  "upgradeModalSubtitle": {
+    "message": "解锁自定义日期范围等完整功能"
+  },
+  "upgradeFeature1": {
+    "message": "自定义日期范围采集"
+  },
+  "upgradeFeature2": {
+    "message": "每次不限帖子数量"
+  },
+  "upgradeFeature3": {
+    "message": "Excel 导出"
+  },
+  "upgradeFeature4": {
+    "message": "优先客户支持"
+  },
+  "planProPrice": {
+    "message": "TODO / 月"
+  },
+  "subscribeNowLabel": {
+    "message": "立即订阅"
+  },
+  "maybeLaterLabel": {
+    "message": "暂不升级"
+  },
+  "checkingPaymentLabel": {
+    "message": "正在验证支付状态..."
+  },
+  "waitingPaymentLabel": {
+    "message": "支付页面已打开，等待支付完成"
+  },
+  "paymentSuccessLabel": {
+    "message": "升级成功！正在刷新..."
+  },
+  "openPaymentPageLabel": {
+    "message": "重新打开支付页面"
+  },
+  "daysLeftLabel": {
+    "message": "天后到期"
+  },
+  "expiredLabel": {
+    "message": "已到期"
   }
 }

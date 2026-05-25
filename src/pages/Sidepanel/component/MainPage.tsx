@@ -1,8 +1,8 @@
 import "../../../assets/fonts/fonts.css";
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import type { FC } from "react";
-import { crawlAccountType, HistoryDataType, userDataType } from "../data";
-import { Alert, Button, Form, Layout, Space, Spin, Tag, Typography } from "antd";
+import { crawlAccountType, HistoryDataType } from "../data";
+import { Button, Form, Layout, message, Space, Tag, Typography } from "antd";
 import { ProForm, ProFormDateRangePicker, ProFormText, ProList } from "@ant-design/pro-components";
 import {
   CLEAR_HISTORY,
@@ -13,14 +13,35 @@ import {
   LATEST_COLLECTED_TRACE,
   START_COLLECTION,
   STOP_COLLECTION,
-  USER_PROFILE,
 } from "../../consts";
 import { sendRuntimeMessage } from "../../../utils/runtime";
-import { DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined, GithubOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { appFontFamily, brandColors } from "../../../theme/yellowTheme";
 
 const { Content } = Layout;
+
+const GH_STYLE = `
+  @keyframes gh-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+  .gh-btn { animation: gh-float 3s ease-in-out infinite; transition: color 0.2s, transform 0.15s; }
+  .gh-btn:hover { animation: none !important; transform: scale(1.12); }
+`;
+
+const COLLECTING_QUIPS = [
+  "Shh... sneaking past the algorithm...",
+  "Counting likes so you don't have to...",
+  "Teaching a robot to scroll so I don't have to...",
+  "Harvesting the chronological timeline...",
+  "One scroll to rule them all...",
+  "The data must flow...",
+  "Befriending the Instagram API...",
+  "In stealth mode. Do not disturb.",
+  "Scrolling into the void...",
+  "Your data is being kidnapped. Politely.",
+];
 
 const sectionStyle: CSSProperties = {
   background: brandColors.surface,
@@ -29,18 +50,24 @@ const sectionStyle: CSSProperties = {
   boxShadow: brandColors.glow,
 };
 
-const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) => {
+const MainPage: FC = () => {
   const [historyData, setHistoryData] = useState<HistoryDataType[]>([]);
-  const [userData, setUserData] = useState<userDataType | null>(null);
   const [isCollecting, setIsCollecting] = useState<boolean>(false);
-  const [isVisitor, setIsVisitor] = useState<boolean>(true);
-  const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [quip, setQuip] = useState("");
+  const quipTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const [form] = Form.useForm();
 
-  const planLabel = useMemo(
-    () => (isVisitor ? chrome.i18n.getMessage("freePlanLabel") : chrome.i18n.getMessage("memberPlanLabel")),
-    [isVisitor]
-  );
+  useEffect(() => {
+    if (isCollecting) {
+      const pick = () => COLLECTING_QUIPS[Math.floor(Math.random() * COLLECTING_QUIPS.length)];
+      setQuip(pick());
+      quipTimer.current = setInterval(() => setQuip(pick()), 3000);
+    } else {
+      if (quipTimer.current) clearInterval(quipTimer.current);
+      setQuip("");
+    }
+    return () => { if (quipTimer.current) clearInterval(quipTimer.current); };
+  }, [isCollecting]);
 
   const onFormFinish = async (formData: {
     accountId: string;
@@ -72,9 +99,9 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
       payload: {
         runId: latestCrawledTime,
         accountId,
-        accountType: userData?.type,
-        startTime: isVisitor ? undefined : startTimeValue,
-        endTime: isVisitor ? undefined : endTimeValue,
+        accountType: 1,
+        startTime: startTimeValue,
+        endTime: endTimeValue,
       },
     });
     setIsCollecting(true);
@@ -94,37 +121,25 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
   };
 
   const init = async () => {
-    setIsInitializing(true);
-    try {
-      const profileStore = await chrome.storage.local.get(USER_PROFILE);
-      const profile = profileStore[USER_PROFILE] as userDataType | undefined;
-      if (profile) {
-        setUserData(profile);
-        setIsVisitor(profile?.type === 0);
-      }
-
-      const collectingState = await chrome.storage.local.get(COLLECTING_STATE);
-      const stored = collectingState[COLLECTING_STATE] as { isCollecting?: boolean } | undefined;
-      if (typeof stored?.isCollecting === "boolean") {
-        setIsCollecting(stored.isCollecting);
-      }
-
-      const storedHistory = await chrome.storage.local.get(LATEST_COLLECTED_TRACE);
-      const latestCollectedAccount = storedHistory[LATEST_COLLECTED_TRACE] as string | undefined;
-      if (latestCollectedAccount) {
-        try {
-          const parsedAccount: crawlAccountType = JSON.parse(latestCollectedAccount);
-          form.setFieldsValue({
-            accountId: parsedAccount.accountId,
-            date: [parsedAccount.startDate, parsedAccount.endDate],
-          });
-        } catch (e) {}
-      }
-
-      await loadHistory();
-    } finally {
-      setIsInitializing(false);
+    const collectingState = await chrome.storage.local.get(COLLECTING_STATE);
+    const stored = collectingState[COLLECTING_STATE] as { isCollecting?: boolean } | undefined;
+    if (typeof stored?.isCollecting === "boolean") {
+      setIsCollecting(stored.isCollecting);
     }
+
+    const storedHistory = await chrome.storage.local.get(LATEST_COLLECTED_TRACE);
+    const latestCollectedAccount = storedHistory[LATEST_COLLECTED_TRACE] as string | undefined;
+    if (latestCollectedAccount) {
+      try {
+        const parsedAccount: crawlAccountType = JSON.parse(latestCollectedAccount);
+        form.setFieldsValue({
+          accountId: parsedAccount.accountId,
+          date: [parsedAccount.startDate, parsedAccount.endDate],
+        });
+      } catch (e) {}
+    }
+
+    await loadHistory();
   };
 
   const openPreview = async (row: HistoryDataType) => {
@@ -166,23 +181,6 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
       chrome.storage.onChanged.removeListener(onStorageChange);
     };
   }, []);
-
-  if (isInitializing) {
-    return (
-      <Layout
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: brandColors.background,
-        }}
-      >
-        <Spin size="large" />
-      </Layout>
-    );
-  }
 
   return (
     <Layout style={{ minHeight: "100vh", background: brandColors.background }}>
@@ -251,53 +249,30 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
               >
                 {chrome.i18n.getMessage("platformLabel")} · {chrome.i18n.getMessage("PlatfromIns")}
               </Tag>
-              <Tag
-                style={{
-                  borderRadius: 999,
-                  padding: "4px 10px",
-                  background: brandColors.tag,
-                  border: "none",
-                  color: brandColors.tagText,
-                  fontFamily: appFontFamily,
-                }}
-              >
-                {chrome.i18n.getMessage("planLabel")} · {planLabel}
-              </Tag>
             </Space>
           </div>
 
-          <div style={{ textAlign: "right", minWidth: 118 }}>
-            <Typography.Text
+          <div style={{ flexShrink: 0 }}>
+            <style>{GH_STYLE}</style>
+            <a
+              className="gh-btn"
+              href="https://github.com/Syueying/PostRay"
+              target="_blank"
+              rel="noreferrer"
               style={{
-                display: "block",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
                 color: brandColors.textMuted,
-                fontSize: 12,
-                marginBottom: 4,
+                fontSize: 13,
                 fontFamily: appFontFamily,
+                textDecoration: "none",
+                fontWeight: 500,
               }}
             >
-              {chrome.i18n.getMessage("signedInAsLabel")}
-            </Typography.Text>
-            <Typography.Text
-              strong
-              style={{
-                display: "block",
-                color: brandColors.text,
-                marginBottom: 12,
-                fontFamily: appFontFamily,
-              }}
-            >
-              {userData?.username || "-"}
-            </Typography.Text>
-            <Button
-              type="default"
-              onClick={async () => {
-                if (!window.confirm(chrome.i18n.getMessage("logoutConfirmLabel"))) return;
-                await onLogout?.();
-              }}
-            >
-              {chrome.i18n.getMessage("logoutButtonLabel")}
-            </Button>
+              <GithubOutlined style={{ fontSize: 16 }} />
+              GitHub
+            </a>
           </div>
         </div>
 
@@ -361,15 +336,6 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
               }}
             />
 
-            {isVisitor && (
-              <Alert
-                style={{ marginBottom: 16, fontFamily: appFontFamily }}
-                description={chrome.i18n.getMessage("freeUserDateHint")}
-                type="warning"
-                showIcon
-              />
-            )}
-
             <ProFormDateRangePicker
               label={
                 <span style={{ fontFamily: appFontFamily, color: brandColors.text }}>
@@ -379,7 +345,7 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
               width="xl"
               fieldProps={{
                 style: { marginBottom: 0, width: "100%", maxWidth: "100%", fontFamily: appFontFamily },
-                disabled: isCollecting || isVisitor,
+                disabled: isCollecting,
                 disabledDate: (current) => current && current > dayjs().endOf("day"),
               }}
               transform={(values) => {
@@ -390,9 +356,25 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
               }}
               name="date"
               placeholder={["", ""]}
-              rules={isVisitor ? [] : [{ required: true, message: chrome.i18n.getMessage("alertNoDateRange") }]}
+              rules={[{ required: true, message: chrome.i18n.getMessage("alertNoDateRange") }]}
             />
           </ProForm>
+
+          {isCollecting && quip && (
+            <Typography.Text
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: 10,
+                color: brandColors.textMuted,
+                fontSize: 12,
+                fontStyle: "italic",
+                fontFamily: appFontFamily,
+              }}
+            >
+              {quip}
+            </Typography.Text>
+          )}
         </div>
 
         <div
@@ -448,7 +430,7 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
               dataSource={historyData}
               showActions="hover"
               onDataSourceChange={setHistoryData}
-              locale={{ emptyText: chrome.i18n.getMessage("noDataLabel") }}
+              locale={{ emptyText: "Your data vault is empty. Time to harvest. 🌾" }}
               onRow={(record) => ({
                 onClick: () => openPreview(record),
                 style: { cursor: "pointer" },
@@ -513,6 +495,7 @@ const MainPage: FC<{ onLogout?: () => void | Promise<void> }> = ({ onLogout }) =
                           type: EXPORT_RUN,
                           payload: { runId: row.runId },
                         });
+                        message.success("Data acquired. Use it wisely. 🕵️");
                       }}
                     >
                       {chrome.i18n.getMessage("exportLabel")}

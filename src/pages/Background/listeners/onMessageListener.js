@@ -1,4 +1,4 @@
-import { CHECK_USERNAME, CHECK_PAYMENT_STATUS, CLAW_U, CLEAR_HISTORY, COLLECTING_STATE, EXPORT_RUN, LIST_RUNS, LOGIN, REGISTER, GET_USER_TYPE, LOGOUT, NET_RESPONSE, NET_TIMEOUT, START_COLLECTION, START_HOOK, START_SCROLL, STOP_COLLECTION, HISTORY, HISTORY_REFRESH_TS, DEFAULT_ITEMS_TO_COLLECT, USER_PROFILE } from "../../consts";
+import { CLEAR_HISTORY, COLLECTING_STATE, EXPORT_RUN, LIST_RUNS, NET_RESPONSE, NET_TIMEOUT, START_COLLECTION, START_HOOK, START_SCROLL, STOP_COLLECTION, HISTORY, HISTORY_REFRESH_TS, DEFAULT_ITEMS_TO_COLLECT } from "../../consts";
 import { addRecords, deleteAllRunStores, deleteRunRecords, getRecordsByRun } from "../utils/recordsDb";
 
 import * as XLSX from "xlsx";
@@ -6,8 +6,6 @@ import * as XLSX from "xlsx";
 const runState = new Map();
 const NO_RESPONSE_TIMEOUT_MS = 10000;
 const INITIAL_RESPONSE_TIMEOUT_MS = 15000;
-const SUPABASE_ORIGIN = "https://cfhshhogusutbyctcjsn.supabase.co";
-const AUTH_LOGIN_STATE = "AUTH_LOGIN_STATE";
 
 const clearNoResponseTimer = (state) => {
   if (state?.noResponseTimer) {
@@ -26,13 +24,8 @@ const armNoResponseTimer = (tabId, timeoutMs = NO_RESPONSE_TIMEOUT_MS, reason = 
   runState.set(tabId, state);
 };
 
-const clearAuthState = async () => {
-  await chrome.storage.local.remove(AUTH_LOGIN_STATE);
-};
 
 export const onMessageListener = () => {
-  var accountTypeGlobal = 0
-
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     (async () => {
       if (msg?.type === START_COLLECTION) {
@@ -42,7 +35,6 @@ export const onMessageListener = () => {
       }
 
       if (msg?.type === NET_RESPONSE) {
-        msg.payload["accountType"] = accountTypeGlobal;
         await handleNetResponse(msg.payload, sender);
         sendResponse({ ok: true });
         return;
@@ -53,117 +45,6 @@ export const onMessageListener = () => {
         if (tabId != null) {
           await finalizeRun(tabId, "timeout");
         }
-        sendResponse({ ok: true });
-        return;
-      }
-
-      if (msg?.type === CHECK_USERNAME) {
-        const { usernameHash } = msg.payload || {};
-        if (!usernameHash) {
-          sendResponse({ ok: false, error: "Missing usernameHash" });
-          return;
-        }
-        const res = await fetch("https://cfhshhogusutbyctcjsn.supabase.co/functions/v1/check-username", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer sb_publishable_5XCWtpIcB4FQjkGuJf0AEA_433HDbTc",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username: usernameHash }),
-        });
-        const json = await res.json();
-        sendResponse({ ok: true, data: json });
-        return;
-      }
-
-      if (msg?.type === LOGIN) {
-        const { username, pwd } = msg.payload || {};
-        if (!username || !pwd) {
-          sendResponse({ ok: false, error: "Missing username or pwd" });
-          return;
-        }
-        const res = await fetch("https://cfhshhogusutbyctcjsn.supabase.co/functions/v1/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ username, pwd }),
-        });
-        const json = await res.json();
-        if (!json.success) {
-          sendResponse({ ok: false, msg: json?.msg || "Login failed" });
-          return;
-        }
-        sendResponse({ ok: true, data: json});
-        return;
-      }
-
-      if (msg?.type === REGISTER) {
-        const { 
-          username: username, 
-          username_ori: username_ori, 
-          password: password } = msg.payload || {};
-        if (!username || !password) {
-          sendResponse({ ok: false, error: "Missing username or password" });
-          return;
-        }
-        const res = await fetch("https://cfhshhogusutbyctcjsn.supabase.co/functions/v1/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ username: username, username_ori: username_ori, password: password }),
-        });
-        const json = await res.json();
-        console.warn("register response", json);
-        
-        if (!json?.success) {
-          let msg = "Register failed";
-          if (json?.msg === "username existed") {
-            msg = chrome.i18n.getMessage("usernameDuplicateLabel");
-          }
-          sendResponse({ ok: false, msg: msg });
-          return;
-        }
-
-        sendResponse({ ok: true, data: json});
-        return;
-      }
-
-      if (msg?.type === GET_USER_TYPE) {
-        const { username } = msg.payload || {};
-        if (!username) {
-          sendResponse({ ok: false, error: "Missing username" });
-          return;
-        }
-        const res = await fetch("https://cfhshhogusutbyctcjsn.supabase.co/functions/v1/get-user-permissions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ username }),
-        });
-        const json = await res.json();
-        // {
-        //   "success": true,
-        //   "permission_codes": {
-        //       "code": "0"
-        //   }
-        // }
-        if (!json.success || json?.error) {
-          sendResponse({ ok: false, msg: json?.msg || json?.error || "Get user permissions failed" });
-          return;
-        }
-        sendResponse({ ok: true, data: json });
-        return;
-      }
-
-      if (msg?.type === LOGOUT) {
-        await clearAuthState();
-        await clearHistory();
         sendResponse({ ok: true });
         return;
       }
@@ -188,44 +69,6 @@ export const onMessageListener = () => {
         }
         await exportRunToExcel(runId);
         sendResponse({ ok: true });
-        return;
-      }
-
-      if (msg?.type === CHECK_PAYMENT_STATUS) {
-        const clawUData = await chrome.storage.local.get(CLAW_U);
-        const hashedUsername = clawUData[CLAW_U];
-        if (!hashedUsername) {
-          sendResponse({ ok: false, upgraded: false });
-          return;
-        }
-        const profileData = await chrome.storage.local.get(USER_PROFILE);
-        const profile = profileData[USER_PROFILE];
-        // TODO: This reuses the existing get-user-permissions endpoint.
-        // Once the payment webhook updates the user type in Supabase, this will detect the change.
-        const res = await fetch(`${SUPABASE_ORIGIN}/functions/v1/get-user-permissions`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ username: hashedUsername }),
-        });
-        const json = await res.json();
-        if (!json.success) {
-          sendResponse({ ok: false, upgraded: false });
-          return;
-        }
-        // permission_codes is a direct number (0=free, 1=pro), updated_at is a top-level field
-        const newType = Number(json?.permission_codes ?? 0);
-        const newUpdatedAt = json?.updated_at ?? null;
-        const currentType = Number(profile?.type ?? 0);
-        const upgraded = newType !== 0 && currentType === 0;
-        const typeChanged = newType !== currentType;
-        const updatedAtChanged = newUpdatedAt !== (profile?.updatedAt ?? null);
-        if (typeChanged || updatedAtChanged) {
-          await chrome.storage.local.set({
-            [USER_PROFILE]: { ...profile, type: newType, updatedAt: newUpdatedAt },
-          });
-        }
-        sendResponse({ ok: true, upgraded });
         return;
       }
 

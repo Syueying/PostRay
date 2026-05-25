@@ -198,6 +198,12 @@
     "message": "Free plan collects the most recent 50 public posts. Upgrade to unlock custom date ranges.",
     "description": "Hint for free users about date range"
   },
+  "freeUserDateHintPre": {
+    "message": "Free plan: most recent 50 posts only."
+  },
+  "freeUserDateHintPost": {
+    "message": "to unlock custom date ranges."
+  },
   "navigateToInstagramAlert": {
     "message": "Open an Instagram profile page to use PostRay.",
     "description": "Navigate to Instagram alert"
@@ -269,5 +275,53 @@
   },
   "workspaceHeadlineLabel": {
     "message": "Instagram Public Post Data"
+  },
+  "upgradeButtonLabel": {
+    "message": "Upgrade"
+  },
+  "upgradeModalTitle": {
+    "message": "Upgrade to Pro"
+  },
+  "upgradeModalSubtitle": {
+    "message": "Unlock custom date ranges and more"
+  },
+  "upgradeFeature1": {
+    "message": "Custom date range collection"
+  },
+  "upgradeFeature2": {
+    "message": "Unlimited posts per run"
+  },
+  "upgradeFeature3": {
+    "message": "Excel export"
+  },
+  "upgradeFeature4": {
+    "message": "Priority support"
+  },
+  "planProPrice": {
+    "message": "TODO / month"
+  },
+  "subscribeNowLabel": {
+    "message": "Subscribe Now"
+  },
+  "maybeLaterLabel": {
+    "message": "Maybe later"
+  },
+  "checkingPaymentLabel": {
+    "message": "Verifying payment..."
+  },
+  "waitingPaymentLabel": {
+    "message": "Payment page opened — waiting for payment"
+  },
+  "paymentSuccessLabel": {
+    "message": "Upgrade successful! Refreshing..."
+  },
+  "openPaymentPageLabel": {
+    "message": "Open payment page again"
+  },
+  "daysLeftLabel": {
+    "message": "days left"
+  },
+  "expiredLabel": {
+    "message": "Expired"
   }
 }

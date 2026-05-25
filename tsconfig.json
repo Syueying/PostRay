@@ -20,5 +20,6 @@
             "@@test/*": ["./src/.umi-test/*"]
         }
     },
-    "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"]
+    "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"],
+    "exclude": ["node_modules", "build", "supabase"]
 }
