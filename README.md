@@ -40,6 +40,16 @@
 
 ---
 
+## Preview / 效果预览
+
+<div align="center">
+  <img src="./docs/postray_1.png" width="720" alt="PostRay collecting posts" />
+  <br /><br />
+  <img src="./docs/postray_2.png" width="720" alt="PostRay data viewer and export" />
+</div>
+
+---
+
 ## Support / 支持作者
 
 If this tool saved you time, feel free to buy me a coffee ☕
