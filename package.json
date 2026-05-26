@@ -14,7 +14,6 @@
     "react-markdown": "^9.1.0",
     "source-map-loader": "^5.0.0",
     "ssestream": "^1.1.0",
-    "supabase": "^2.76.12",
     "ts-loader": "^9.5.4",
     "xlsx": "^0.18.5"
   },

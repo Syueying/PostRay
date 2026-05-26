@@ -23,10 +23,7 @@ const entryPoints = {
   background: path.join(__dirname, "src", "pages", "Background", "index.js"),
   contentScript: path.join(__dirname, "src", "pages", "Content", "index.tsx"),
   sidepanel: path.join(__dirname, "src", "pages", "Sidepanel", "index.tsx"),
-  viewer: path.join(__dirname, "src", "pages", "Viewer", "index.tsx"),
-  info: path.join(__dirname, "src", "pages", "Info", "index.tsx"),
-  plans: path.join(__dirname, "src", "pages", "Plans", "index.tsx"),
-  landing: path.join(__dirname, "src", "pages", "Landing", "index.tsx"),
+  viewer: path.join(__dirname, "src", "pages", "Viewer", "index.tsx")
 };
 
 const htmlPlugins = Object.keys(entryPoints)
@@ -42,13 +39,7 @@ const htmlPlugins = Object.keys(entryPoints)
       htmlFileName = "Sidepanel/sidepanel.html";
     } else if (entryName === "viewer") {
       htmlFileName = "Viewer/viewer.html";
-    } else if (entryName === "info") {
-      htmlFileName = "Info/info.html";
-    } else if (entryName === "plans") {
-      htmlFileName = "Plans/plans.html";
-    } else if (entryName === "landing") {
-      htmlFileName = "Landing/landing.html";
-    }
+    } 
 
     const templatePath = path.join(
       __dirname,
